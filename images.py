@@ -16,8 +16,9 @@ class Resource(object):
         self.storage_path = storage_path
 
     def on_get(self, req, resp):
-        #taking x, y from params:
         resp.status = falcon.HTTP_200
+        
+        #taking x, y from params. Can be complicated:
         x = int(req.params['xaxis'])
         x2 = int(req.params['x2axis'])
         y= int(req.params['yaxis'])
@@ -27,10 +28,11 @@ class Resource(object):
 
         y = [y, y2]
 
-        #x= pd.DataSeries(x1,x2)
-        #y=pd.DataSeries(y1,y2)
+        #Not needed, but can be used if the input is not that simple
+        #x= pd.Series(x1,x2)
+        #y=pd.Series(y1,y2)
 
-        #plotting and saving:
+        #plotting and saving to the project folder. Repository can be changed:
         fig, ax = plt.subplots()
         ax.plot(x, y)
         name ='my_plot.png'
@@ -40,10 +42,9 @@ class Resource(object):
         ext = os.path.splitext(name)[1][1:]
         resp.content_type = _ext_to_media_type(ext)
 
+        #For the repository to be optional
         image_path = os.path.join(self.storage_path, name)
+        
+        #Opening the file as response
         resp.stream = open(image_path, 'rb')
         resp.stream_len = os.path.getsize(image_path)
-
-
-        #resp.data = msgpack.packb(doc, use_bin_type=True)
-        #resp.content_type = falcon.MEDIA_MSGPACK
